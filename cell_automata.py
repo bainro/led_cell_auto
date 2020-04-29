@@ -8,7 +8,7 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num = 30           # controls which cellular automate is generated (E.g. rule 110)
+    rule_num = 110          # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = True       # direction control toggle, <- or ->
     sleep_time = 5e4        # larger numbers make the scrolling slower
 
@@ -30,13 +30,14 @@ class Automata(SampleBase):
     blue_purple_colors = ["dark_blue", "darker_blue", "darkest_blue"]
     green_colors = ["green", "camo_green", "eww_green"]
     color_set = blue_purple_colors
-    color_set = [colors[color_key] for color_key in color_set]
-    color_set = np.array(color_set, dtype=np.uint8)
 
     def __init__(self, gui = False, *args, **kwargs):
         super(Automata, self).__init__(*args, **kwargs)
         self.board = np.zeros((128,32,3), dtype=np.uint8)   # WHC format
         self.process()
+        self.color_set = [self.colors[color_key] for color_key in self.color_set]
+        self.color_set = np.array(self.color_set, dtype=np.uint8)
+
 
     # called by base class SampleBase to start the game
     def run(self):
@@ -50,14 +51,14 @@ class Automata(SampleBase):
         self.board[127, 31] = 1
         self.col_neighbors = np.array([1, 2, 4], dtype=np.uint8)
         # format a decimal number as binary then reverse it using the [] op.
-        rule = "{0:08b}".format(self.rule_cum)[::-1]
+        rule = "{0:08b}".format(self.rule_num)[::-1]
         self.rule_kernel = np.array([int(x) for x in rule], dtype=np.uint8)
 
         # set each position's/pixel's color.
         for col_i in range(self.board.shape[0]):
             for row_i in range(self.board.shape[1]):
-                rand_color_i = randint(0, len(self.colors)-1)
-                self.board[col_i, row_i, 1:] = self.colors[rand_color_i]
+                rand_color_i = randint(0, len(self.color_set)-1)
+                self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
 
     def step(self):
         # temp save col
@@ -88,18 +89,16 @@ class Automata(SampleBase):
         try:
             while True:
                 self.offset_canvas.Clear()
-                
+
                 self.usleep(self.sleep_time) # easy way to tune FPS
                 self.step()
-                
+
                 for col_i in range(self.board.shape[0]):
                     for row_i in range(self.board.shape[1]):
-                        if self.dir_toggle:
-                            col_i *= -1
-                            row_i *= -1
                         if (self.board[col_i, row_i, 0] >= 1):
                             r_, g_, b_ = self.board[col_i, row_i, 1:4]
                             # (0, 31) is the (x, y) coordinates of the bottom left pixel when horizontal (128x32).
+                            col_i = abs(col_i - self.board.shape[0] - 1)
                             self.offset_canvas.SetPixel(col_i, row_i, r_, g_, b_)
 
                 self.offset_canvas = self.matrix.SwapOnVSync(self.offset_canvas)
