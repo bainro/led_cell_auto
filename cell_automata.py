@@ -13,17 +13,17 @@ class Automata(SampleBase):
     sleep_time = 5e4        # larger numbers make the scrolling slower
 
     colors = {
-        "dark_red": [115, 18, 81],       
+        "dark_red": [115, 18, 81],
         "red": [255, 0, 0],
-        "black": [0, 0, 0],          
-        "white": [255, 255, 255],    
-        "gray": [55, 55, 55],        
-        "dark_blue": [20, 7, 70],        
-        "darker_blue": [12, 5, 40],       
-        "darkest_blue": [7, 4, 36],        
-        "green": [0, 255, 0],         
-        "camo_green": [34, 130, 37],   
-        "eww_green": [144, 255, 18],    
+        "black": [0, 0, 0],
+        "white": [255, 255, 255],
+        "gray": [55, 55, 55],
+        "dark_blue": [20, 7, 70],
+        "darker_blue": [12, 5, 40],
+        "darkest_blue": [7, 4, 36],
+        "green": [0, 255, 0],
+        "camo_green": [34, 130, 37],
+        "eww_green": [144, 255, 18],
     }
 
     # color sets to choose from
@@ -49,8 +49,9 @@ class Automata(SampleBase):
         # starts with just a single cell "alive", i.e. on
         self.board[127, 31] = 1
         self.col_neighbors = np.array([1, 2, 4], dtype=np.uint8)
-        # format a decimal number as binary using an f string then reverse it using the [] op.
-        self.rule_kernel = np.array([int(x) for x in f'{30:08b}'[::-1]], dtype=np.uint8)
+        # format a decimal number as binary then reverse it using the [] op.
+        rule = "{0:08b}".format(self.rule_cum)[::-1]
+        self.rule_kernel = np.array([int(x) for x in rule], dtype=np.uint8)
 
         # set each position's/pixel's color.
         for col_i in range(self.board.shape[0]):
