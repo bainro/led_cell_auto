@@ -50,7 +50,7 @@ class Automata(SampleBase):
         self.board[127, 31] = 1
         self.col_neighbors = np.array([1, 2, 4], dtype=np.uint8)
         # format a decimal number as binary using an f string then reverse it using the [] op.
-        self.rule_kernel = np.array([int(x) for x in f'{self.rule_num:08b}'[::-1]], dtype=np.uint8)
+        self.rule_kernel = np.array([int(x) for x in f'{int(self.rule_num):08b}'[::-1]], dtype=np.uint8)
 
         # set each position's/pixel's color.
         for col_i in range(self.board.shape[0]):
