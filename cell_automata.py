@@ -8,28 +8,31 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num = 110          # controls which cellular automate is generated (E.g. rule 110)
+    rule_num   = 110        # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = True       # direction control toggle, <- or ->
-    sleep_time = 1e4        # larger numbers make the scrolling slower
+    sleep_time = 5e3        # larger numbers make the scrolling slower
 
     colors = {
-        "dark_red":     [115,  18,  81],
         "red":          [255,   0,   0],
         "black":        [  0,   0,   0],
         "white":        [255, 255, 255],
-        "gray":         [ 55, 55,   55],
+        "gray":         [ 55,  55,  55],
         "green":        [  0,  30,   0],
         "eww_green":    [ 20,  55,   4],
         "camo_green":   [ 17,  65,  18],
-        "dark_blue":    [ 20,  7,   70],
-        "darker_blue":  [ 12,  5,   40],
+        "dark_blue":    [ 20,   7,  70],
+        "darker_blue":  [ 12,   5,  40],
         "darkest_blue": [  7,   4,  36],
+        "red_1":        [100,   0,   0],
+        "red_2":        [ 55,   4,   2],
+        "red_3":        [ 15,   0,   0],
     }
 
     # color sets to choose from
     blue_purple_colors = ["dark_blue", "darker_blue", "darkest_blue"]
     green_colors = ["green", "camo_green", "eww_green"]
-    color_set = green_colors #blue_purple_colors
+    red_colors = ["red_1", "red_2", "red_3"]
+    color_set = red_colors #blue_purple_colors
 
     def __init__(self, gui = False, *args, **kwargs):
         super(Automata, self).__init__(*args, **kwargs)
@@ -71,7 +74,7 @@ class Automata(SampleBase):
             cur_col = np.reshape(self.board[-1,:,0], self.board.shape[1])
 
         # shift & cut off top col
-        self.board[:-1,:,:] = self.board[1:,:,:]
+        self.board[:-1,:, 0] = self.board[1:,:, 0]
 
         rule_index = signal.convolve2d(
                          cur_col[None,:],
