@@ -9,7 +9,7 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 30         # controls which cellular automate is generated (E.g. rule 110)
+    rule_num   = 110        # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = True       # direction control toggle, <- or ->
     sleep_time = 1e3        # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
@@ -67,7 +67,7 @@ class Automata(SampleBase):
         if self.rand_col_1:
             self.board[-1,:,0] = [randint(0,1) for _ in range(self.board.shape[1])]
         else:
-            self.board[-1,16] = 1
+            self.board[-1,-1] = 1
         self.col_neighbors = np.array([1, 2, 4], dtype=np.uint8)
         # format a decimal number as binary then reverse it using the [] op.
         rule = "{0:08b}".format(self.rule_num)[::-1]
@@ -77,10 +77,7 @@ class Automata(SampleBase):
             if self.img_bckgnd:
                 img = cv.imread(self.img)
                 img = cv.resize(img, (128, 32))
-                self.board[:,:,1:] = np.rot90(img//3)
-                #for col_i in range(self.board.shape[0]):
-                #    for row_i in range(self.board.shape[1]):
-                #        self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
+                self.board[:,:,1:] = np.rot90(img//3) # division lowers brightness
             else:
                 # set each position's/pixel's color.
                 for col_i in range(self.board.shape[0]):
@@ -89,14 +86,6 @@ class Automata(SampleBase):
                         self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
 
     def step(self):
-        # Trying to make 110 not loop, might be fixed
-        #if self.rule_num == 110:
-        #    cur_col = self.board[0,:,0]
-        #    cur_col = cur_col | self.board[-1,:,0]
-        #    #cur_col = np.bitwise_xor(cur_col, self.board[-1,:,0])
-        #    cur_col = np.reshape(cur_col, self.board.shape[1])
-        #else:
-
         # create bottom col
         cur_col = np.reshape(self.board[-1,:,0], self.board.shape[1])
 
@@ -113,6 +102,14 @@ class Automata(SampleBase):
                          boundary='wrap')
         next_col = self.rule_kernel[rule_index[0]]
         self.board[-1, :, 0] = next_col
+
+        # inject some random deaths to keep 110 from looping
+        if self.rule_num == 110 and randint(0,300) == 69:
+            #rand_col_i = randint(0, self.board.shape[0]-1)
+            #self.board[rand_col_i,:,0] = 0
+            # black out every even col
+            self.board[::2,:,0] = 0
+
         # This way causes the pixels to change color at each step
         # assign color values to the new col
         if not self.color_mode:
