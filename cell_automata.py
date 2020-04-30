@@ -9,13 +9,15 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 30         # controls which cellular automate is generated (E.g. rule 110)
-    dir_toggle = False      # direction control toggle, <- or ->
+    rule_num   = 30 	    # controls which cellular automate is generated (E.g. rule 110)
+    dir_toggle = False	    # direction control toggle, <- or ->
     sleep_time = 0          # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
-    img        = "../tmp.png"
+    img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
+    img_flip   = True	    # Flips image across the y-axis.
+    img        = "kitty_bae.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -78,11 +80,13 @@ class Automata(SampleBase):
                 img = cv.imread(self.img)
                 img = cv.resize(img, (128, 32))
                 # some images require swapping color channels. e.g. BRG->RGB, etc
-                self.board[:,:,1:] = np.rot90(img//2) # division lowers brightness
+                img = np.rot90(img//1) # division lowers brightness
+                self.board[:,:,1:] = np.flip(img,0)
                 tmp = np.array(self.board[:,:,1:], dtype=np.uint8)
-                self.board[:,:,1] = tmp[:,:,2]
-                self.board[:,:,2] = tmp[:,:,1]
-                self.board[:,:,3] = tmp[:,:,0]
+                if self.img_c_mode:
+                        self.board[:,:,1] = tmp[:,:,2]
+                        self.board[:,:,2] = tmp[:,:,1]
+                        self.board[:,:,3] = tmp[:,:,0]
             else:
                 # set each position's/pixel's color.
                 for col_i in range(self.board.shape[0]):
