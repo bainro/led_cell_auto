@@ -9,13 +9,13 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 110        # controls which cellular automate is generated (E.g. rule 110)
-    dir_toggle = True       # direction control toggle, <- or ->
-    sleep_time = 1e3        # larger numbers make the scrolling slower
+    rule_num   = 30         # controls which cellular automate is generated (E.g. rule 110)
+    dir_toggle = False      # direction control toggle, <- or ->
+    sleep_time = 0          # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
-    img        = "rainbow.png"
+    img        = "tool.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -101,14 +101,17 @@ class Automata(SampleBase):
                          mode='same',
                          boundary='wrap')
         next_col = self.rule_kernel[rule_index[0]]
-        self.board[-1, :, 0] = next_col
+        self.board[-1,:,0] = next_col
 
         # inject some random deaths to keep 110 from looping
         if self.rule_num == 110 and randint(0,300) == 69:
             #rand_col_i = randint(0, self.board.shape[0]-1)
             #self.board[rand_col_i,:,0] = 0
             # black out every even col
-            self.board[::2,:,0] = 0
+            #self.board[::2,::2,0] = 0
+            rand_row_i = randint(0, self.board.shape[1]-1)
+            self.board[-1,:,0] = 0
+            self.board[-1,rand_row_i,0] = 1
 
         # This way causes the pixels to change color at each step
         # assign color values to the new col
