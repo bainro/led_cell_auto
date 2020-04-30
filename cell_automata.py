@@ -8,31 +8,40 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 110        # controls which cellular automate is generated (E.g. rule 110)
+    rule_num   = 30         # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = True       # direction control toggle, <- or ->
     sleep_time = 5e3        # larger numbers make the scrolling slower
+    rand_col_1 = False      # whether the first col in random or just the top point
 
     colors = {
         "red":          [255,   0,   0],
         "black":        [  0,   0,   0],
         "white":        [255, 255, 255],
-        "gray":         [ 55,  55,  55],
-        "green":        [  0,  30,   0],
-        "eww_green":    [ 20,  55,   4],
-        "camo_green":   [ 17,  65,  18],
-        "dark_blue":    [ 20,   7,  70],
-        "darker_blue":  [ 12,   5,  40],
-        "darkest_blue": [  7,   4,  36],
-        "red_1":        [100,   0,   0],
+        "yellow":       [255, 255,   0],
+        "green":        [  0, 255,   0],
+        "gray_1":       [ 55,  55,  55],
+        "gray_2":       [ 25,  25,  25],
+        "gray_3":       [ 15,  15,  15],
+        "green_1":      [  0,  30,   0],
+        "green_2":      [ 17,  65,  18],
+        "green_3":      [ 20,  55,   4],
+        "blue_1":       [ 20,   7,  70],
+        "blue_2":       [ 12,   5,  40],
+        "blue_3":       [  7,   4,  36],
+        "red_1":        [130,   0,   0],
         "red_2":        [ 55,   4,   2],
         "red_3":        [ 15,   0,   0],
+        "red_4":        [  5,   0,   1],
     }
 
     # color sets to choose from
-    blue_purple_colors = ["dark_blue", "darker_blue", "darkest_blue"]
-    green_colors = ["green", "camo_green", "eww_green"]
+    blue_colors = ["blue_1", "blue_2", "blue_3"]
+    green_colors = ["green_1", "green_2", "green_3"]
     red_colors = ["red_1", "red_2", "red_3"]
-    color_set = red_colors #blue_purple_colors
+    gray_colors = ["gray_1", "gray_2", "gray_3"]
+    OMG_colors = ["red", "green", "yellow"]
+    test_colors = ["red_2", "red_3", "red_4"]
+    color_set = test_colors
 
     def __init__(self, gui = False, *args, **kwargs):
         super(Automata, self).__init__(*args, **kwargs)
@@ -51,7 +60,10 @@ class Automata(SampleBase):
     def make_board(self):
         self.board = np.zeros((128, 32, 4), dtype=np.uint8)
         # starts with just a single cell "alive", i.e. on
-        self.board[127, 31] = 1
+        if self.rand_col_1:
+            self.board[-1,:,0] = [randint(0,1) for _ in range(self.board.shape[1])]
+        else:
+            self.board[-1,-1] = 1
         self.col_neighbors = np.array([1, 2, 4], dtype=np.uint8)
         # format a decimal number as binary then reverse it using the [] op.
         rule = "{0:08b}".format(self.rule_num)[::-1]
@@ -64,14 +76,16 @@ class Automata(SampleBase):
                 self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
 
     def step(self):
+        # Trying to make 110 not loop, might be fixed
+        #if self.rule_num == 110:
+        #    cur_col = self.board[0,:,0]
+        #    cur_col = cur_col | self.board[-1,:,0]
+        #    #cur_col = np.bitwise_xor(cur_col, self.board[-1,:,0])
+        #    cur_col = np.reshape(cur_col, self.board.shape[1])
+        #else:
+
         # create bottom col
-        if self.rule_num == 110:
-            pushed_col = self.board[0,:,0]
-            cur_col = pushed_col | self.board[-1,:,0]
-            cur_col = np.reshape(cur_col, self.board.shape[1])
-            #cur_col = np.bitwise_xor(cut_col, self.board[126, :])
-        else:
-            cur_col = np.reshape(self.board[-1,:,0], self.board.shape[1])
+        cur_col = np.reshape(self.board[-1,:,0], self.board.shape[1])
 
         # shift & cut off top col
         self.board[:-1,:, 0] = self.board[1:,:, 0]
@@ -102,14 +116,13 @@ class Automata(SampleBase):
 
                 for col_i in range(self.board.shape[0]):
                     for row_i in range(self.board.shape[1]):
-                        if (self.board[col_i, row_i, 0] >= 1):
+                        if self.board[col_i, row_i, 0] >= 1:
                             r_, g_, b_ = self.board[col_i, row_i, 1:4]
                             if self.dir_toggle:
                                 _col_i = abs(col_i - self.board.shape[0] + 1)
                                 _row_i = abs(row_i - self.board.shape[1] + 1)
                                 self.offset_canvas.SetPixel(_col_i, _row_i, r_, g_, b_)
                             else:
-                                # (0, 31) is the (x, y) coordinates of the bottom left pixel when horizontal (128x32).
                                 self.offset_canvas.SetPixel(col_i, row_i, r_, g_, b_)
 
                 self.offset_canvas = self.matrix.SwapOnVSync(self.offset_canvas)
