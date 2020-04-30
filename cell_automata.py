@@ -12,6 +12,7 @@ class Automata(SampleBase):
     dir_toggle = True       # direction control toggle, <- or ->
     sleep_time = 5e3        # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
+    color_mode = True       # Toggles type of pixel coloring
 
     colors = {
         "red":          [255,   0,   0],
@@ -29,9 +30,9 @@ class Automata(SampleBase):
         "blue_2":       [ 12,   5,  40],
         "blue_3":       [  7,   4,  36],
         "red_1":        [130,   0,   0],
-        "red_2":        [ 55,   4,   2],
-        "red_3":        [ 15,   0,   0],
-        "red_4":        [  5,   0,   1],
+        "red_2":        [ 50,   2,   0],
+        "red_3":        [ 35,   1,   0],
+        "red_4":        [ 25,   0,   0],
     }
 
     # color sets to choose from
@@ -41,7 +42,7 @@ class Automata(SampleBase):
     gray_colors = ["gray_1", "gray_2", "gray_3"]
     OMG_colors = ["red", "green", "yellow"]
     test_colors = ["red_2", "red_3", "red_4"]
-    color_set = test_colors
+    color_set = green_colors
 
     def __init__(self, gui = False, *args, **kwargs):
         super(Automata, self).__init__(*args, **kwargs)
@@ -69,11 +70,12 @@ class Automata(SampleBase):
         rule = "{0:08b}".format(self.rule_num)[::-1]
         self.rule_kernel = np.array([int(x) for x in rule], dtype=np.uint8)
 
-        # set each position's/pixel's color.
-        for col_i in range(self.board.shape[0]):
-            for row_i in range(self.board.shape[1]):
-                rand_color_i = randint(0, len(self.color_set)-1)
-                self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
+        if self.color_mode:
+            # set each position's/pixel's color.
+            for col_i in range(self.board.shape[0]):
+                for row_i in range(self.board.shape[1]):
+                    rand_color_i = randint(0, len(self.color_set)-1)
+                    self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
 
     def step(self):
         # Trying to make 110 not loop, might be fixed
@@ -88,7 +90,10 @@ class Automata(SampleBase):
         cur_col = np.reshape(self.board[-1,:,0], self.board.shape[1])
 
         # shift & cut off top col
-        self.board[:-1,:, 0] = self.board[1:,:, 0]
+        if self.color_mode:
+            self.board[:-1,:,0] = self.board[1:,:,0]
+        else:
+            self.board[:-1,:,:] = self.board[1:,:,:]
 
         rule_index = signal.convolve2d(
                          cur_col[None,:],
@@ -99,9 +104,10 @@ class Automata(SampleBase):
         self.board[-1, :, 0] = next_col
         # This way causes the pixels to change color at each step
         # assign color values to the new col
-        # for _row_i in range(self.board.shape[1]):
-        #     rand_color_i = randint(0, len(self.colors)-1)
-        #     self.board[-1, :, 1:] = self.colors[rand_color_i]
+        if not self.color_mode:
+            for _row_i in range(self.board.shape[1]):
+                rand_color_i = randint(0, len(self.color_set)-1)
+                self.board[-1, :, 1:] = self.color_set[rand_color_i]
 
     def render(self):
         r_, g_, b_ = 0, 0, 0
