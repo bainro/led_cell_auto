@@ -15,7 +15,7 @@ class Automata(SampleBase):
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
-    img        = "tool.png"
+    img        = "../tmp.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -77,7 +77,12 @@ class Automata(SampleBase):
             if self.img_bckgnd:
                 img = cv.imread(self.img)
                 img = cv.resize(img, (128, 32))
-                self.board[:,:,1:] = np.rot90(img//3) # division lowers brightness
+                # some images require swapping color channels. e.g. BRG->RGB, etc
+                self.board[:,:,1:] = np.rot90(img//2) # division lowers brightness
+                tmp = np.array(self.board[:,:,1:], dtype=np.uint8)
+                self.board[:,:,1] = tmp[:,:,2]
+                self.board[:,:,2] = tmp[:,:,1]
+                self.board[:,:,3] = tmp[:,:,0]
             else:
                 # set each position's/pixel's color.
                 for col_i in range(self.board.shape[0]):
