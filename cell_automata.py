@@ -4,15 +4,18 @@ from samplebase import SampleBase
 from rgbmatrix import graphics
 from random import randint
 import numpy as np
+import cv2 as cv
 from scipy import signal
 
 class Automata(SampleBase):
 
     rule_num   = 30         # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = True       # direction control toggle, <- or ->
-    sleep_time = 5e3        # larger numbers make the scrolling slower
+    sleep_time = 1e3        # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
+    img_bckgnd = True       # Use image as background. Currently rainbow.png
+    img        = "rainbow.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -64,18 +67,26 @@ class Automata(SampleBase):
         if self.rand_col_1:
             self.board[-1,:,0] = [randint(0,1) for _ in range(self.board.shape[1])]
         else:
-            self.board[-1,-1] = 1
+            self.board[-1,16] = 1
         self.col_neighbors = np.array([1, 2, 4], dtype=np.uint8)
         # format a decimal number as binary then reverse it using the [] op.
         rule = "{0:08b}".format(self.rule_num)[::-1]
         self.rule_kernel = np.array([int(x) for x in rule], dtype=np.uint8)
 
         if self.color_mode:
-            # set each position's/pixel's color.
-            for col_i in range(self.board.shape[0]):
-                for row_i in range(self.board.shape[1]):
-                    rand_color_i = randint(0, len(self.color_set)-1)
-                    self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
+            if self.img_bckgnd:
+                img = cv.imread(self.img)
+                img = cv.resize(img, (128, 32))
+                self.board[:,:,1:] = np.rot90(img//3)
+                #for col_i in range(self.board.shape[0]):
+                #    for row_i in range(self.board.shape[1]):
+                #        self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
+            else:
+                # set each position's/pixel's color.
+                for col_i in range(self.board.shape[0]):
+                    for row_i in range(self.board.shape[1]):
+                        rand_color_i = randint(0, len(self.color_set)-1)
+                        self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
 
     def step(self):
         # Trying to make 110 not loop, might be fixed
