@@ -9,17 +9,17 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 110 	    # controls which cellular automate is generated (E.g. rule 110)
-    dir_toggle = True	    # direction control toggle, <- or ->
-    sleep_time = 0          # larger numbers make the scrolling slower
+    rule_num   = 30 	    # controls which cellular automate is generated (E.g. rule 110)
+    dir_toggle = False	    # direction control toggle, <- or ->
+    sleep_time = 5e4        # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
     img_flip_y = True	    # Flips image across the y-axis.
-    img_flip_x = True	    # Flips image across the y-axis.
+    img_flip_x = False	    # Flips image across the y-axis.
     img_only   = False      # Just draws the image, no cellular automata
-    img        = "../tmp_2.png"
+    img        = "../b_right.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -82,7 +82,7 @@ class Automata(SampleBase):
                 img = cv.imread(self.img)
                 img = cv.resize(img, (128, 32))
                 # some images require swapping color channels. e.g. BRG->RGB, etc
-                img = np.rot90(img//2) # division lowers brightness
+                img = np.rot90(img//1) # division lowers brightness
                 self.board[:,:,1:] = img
 
                 if self.img_flip_y:
