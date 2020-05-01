@@ -19,7 +19,7 @@ class Automata(SampleBase):
     img_flip_y = True	    # Flips image across the y-axis.
     img_flip_x = False	    # Flips image across the y-axis.
     img_only   = True      # Just draws the image, no cellular automata
-    img        = "../b_1.png"
+    img        = "imgs/tool.png"
 
     colors = {
         "red":          [255,   0,   0],
