@@ -9,16 +9,17 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 30 	    # controls which cellular automate is generated (E.g. rule 110)
+    rule_num   = 110 	    # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = False	    # direction control toggle, <- or ->
-    sleep_time = 0          # larger numbers make the scrolling slower
+    sleep_time = 1e4        # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
-    img_flip   = False	    # Flips image across the y-axis.
+    img_flip_y = False	    # Flips image across the y-axis.
+    img_flip_x = False	    # Flips image across the y-axis.
     img_only   = False      # Just draws the image, no cellular automata
-    img        = "imgs/tool.png"
+    img        = "../tmp_1.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -82,10 +83,13 @@ class Automata(SampleBase):
                 img = cv.resize(img, (128, 32))
                 # some images require swapping color channels. e.g. BRG->RGB, etc
                 img = np.rot90(img//2) # division lowers brightness
-                if self.img_flip:
-                    self.board[:,:,1:] = np.flip(img,0)
-                else:
-                    self.board[:,:,1:] = img
+                self.board[:,:,1:] = img
+
+                if self.img_flip_y:
+                    self.board[:,:,1:] = np.flip(self.board[:,:,1:],0)
+                if self.img_flip_x:
+                    self.board[:,:,1:] = np.flip(self.board[:,:,1:],1)
+
                 tmp = np.array(self.board[:,:,1:], dtype=np.uint8)
                 if self.img_c_mode:
                         self.board[:,:,1] = tmp[:,:,2]
@@ -120,6 +124,7 @@ class Automata(SampleBase):
         next_col = self.rule_kernel[rule_index[0]]
         self.board[-1,:,0] = next_col
 
+        """
         # inject some random deaths to keep 110 from looping
         if self.rule_num == 110 and randint(0,300) == 69:
             #rand_col_i = randint(0, self.board.shape[0]-1)
@@ -129,6 +134,7 @@ class Automata(SampleBase):
             rand_row_i = randint(0, self.board.shape[1]-1)
             self.board[-1,:,0] = 0
             self.board[-1,rand_row_i,0] = 1
+        """
 
         # This way causes the pixels to change color at each step
         # assign color values to the new col
