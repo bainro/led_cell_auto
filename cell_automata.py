@@ -10,16 +10,16 @@ from scipy import signal
 class Automata(SampleBase):
 
     rule_num   = 110 	    # controls which cellular automate is generated (E.g. rule 110)
-    dir_toggle = False	    # direction control toggle, <- or ->
-    sleep_time = 1e4        # larger numbers make the scrolling slower
+    dir_toggle = True	    # direction control toggle, <- or ->
+    sleep_time = 0          # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
-    img_flip_y = False	    # Flips image across the y-axis.
-    img_flip_x = False	    # Flips image across the y-axis.
+    img_flip_y = True	    # Flips image across the y-axis.
+    img_flip_x = True	    # Flips image across the y-axis.
     img_only   = False      # Just draws the image, no cellular automata
-    img        = "../tmp_1.png"
+    img        = "../tmp_2.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -150,9 +150,10 @@ class Automata(SampleBase):
         try:
             while True:
                 self.offset_canvas.Clear()
-
-                self.usleep(self.sleep_time) # easy way to tune FPS
                 self.step()
+
+                if self.sleep_time > 0:
+                    self.usleep(self.sleep_time) # easy way to tune FPS
 
                 for col_i in range(self.board.shape[0]):
                     for row_i in range(self.board.shape[1]):
