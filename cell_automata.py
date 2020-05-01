@@ -16,8 +16,9 @@ class Automata(SampleBase):
     color_mode = True       # Toggles type of pixel coloring
     img_bckgnd = True       # Use image as background. Currently rainbow.png
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
-    img_flip   = True	    # Flips image across the y-axis.
-    img        = "kitty_bae.png"
+    img_flip   = False	    # Flips image across the y-axis.
+    img_only   = False      # Just draws the image, no cellular automata
+    img        = "../tmp_2.png"
 
     colors = {
         "red":          [255,   0,   0],
@@ -80,8 +81,11 @@ class Automata(SampleBase):
                 img = cv.imread(self.img)
                 img = cv.resize(img, (128, 32))
                 # some images require swapping color channels. e.g. BRG->RGB, etc
-                img = np.rot90(img//1) # division lowers brightness
-                self.board[:,:,1:] = np.flip(img,0)
+                img = np.rot90(img//2) # division lowers brightness
+                if self.img_flip:
+                    self.board[:,:,1:] = np.flip(img,0)
+                else:
+                    self.board[:,:,1:] = img
                 tmp = np.array(self.board[:,:,1:], dtype=np.uint8)
                 if self.img_c_mode:
                         self.board[:,:,1] = tmp[:,:,2]
@@ -95,6 +99,10 @@ class Automata(SampleBase):
                         self.board[col_i, row_i, 1:] = self.color_set[rand_color_i]
 
     def step(self):
+        if self.img_only:
+            self.board[:,:,0] = 1
+            return
+
         # create bottom col
         cur_col = np.reshape(self.board[-1,:,0], self.board.shape[1])
 

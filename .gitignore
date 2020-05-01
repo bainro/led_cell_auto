@@ -2,3 +2,6 @@ venv
 venv/
 *.swp
 *.pyc
+*.pyc
+__*/
+__*/
