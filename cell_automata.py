@@ -14,12 +14,12 @@ class Automata(SampleBase):
     sleep_time = 0          # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
-    dim_spots  = True       # Dim what would otherwise be blank/black pixels
+    dim_spots  = True       # Dim instead of blank pxs. Only Pi 4
     img_bckgnd = True       # Use image as background. Currently rainbow.png
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
     img_flip   = False	    # Flips image across the y-axis.
     img_only   = False      # Just draws the image, no cellular automata
-    img        = "../tmp_2.png"
+    img        = "imgs/tool.png"
 
     colors = {
         "red":          [255,   0,   0],
