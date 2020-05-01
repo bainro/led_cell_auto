@@ -14,7 +14,6 @@ class Automata(SampleBase):
     sleep_time = 0          # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
     color_mode = True       # Toggles type of pixel coloring
-    dim_spots  = True       # Dim instead of blank pxs. Only Pi 4
     img_bckgnd = True       # Use image as background. Currently rainbow.png
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
     img_flip   = False	    # Flips image across the y-axis.
@@ -151,17 +150,14 @@ class Automata(SampleBase):
 
                 for col_i in range(self.board.shape[0]):
                     for row_i in range(self.board.shape[1]):
-                        r_, g_, b_ = self.board[col_i, row_i, 1:4]
                         if self.board[col_i, row_i, 0] >= 1:
+                            r_, g_, b_ = self.board[col_i, row_i, 1:4]
                             if self.dir_toggle:
                                 _col_i = abs(col_i - self.board.shape[0] + 1)
                                 _row_i = abs(row_i - self.board.shape[1] + 1)
                                 self.offset_canvas.SetPixel(_col_i, _row_i, r_, g_, b_)
                             else:
                                 self.offset_canvas.SetPixel(col_i, row_i, r_, g_, b_)
-                        elif self.dim_spots:
-                            d = 4 # denominator
-                            self.offset_canvas.SetPixel(col_i, row_i, r_//d, g_//d, b_//d)
 
                 self.offset_canvas = self.matrix.SwapOnVSync(self.offset_canvas)
         except KeyboardInterrupt:
