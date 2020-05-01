@@ -9,7 +9,7 @@ from scipy import signal
 
 class Automata(SampleBase):
 
-    rule_num   = 30 	    # controls which cellular automate is generated (E.g. rule 110)
+    rule_num   = 110 	    # controls which cellular automate is generated (E.g. rule 110)
     dir_toggle = False	    # direction control toggle, <- or ->
     sleep_time = 5e4        # larger numbers make the scrolling slower
     rand_col_1 = False      # whether the first col in random or just the top point
@@ -18,8 +18,8 @@ class Automata(SampleBase):
     img_c_mode = True 	    # Switches between image channel formats e.g. RGB & BRG
     img_flip_y = True	    # Flips image across the y-axis.
     img_flip_x = False	    # Flips image across the y-axis.
-    img_only   = False      # Just draws the image, no cellular automata
-    img        = "../b_right.png"
+    img_only   = True      # Just draws the image, no cellular automata
+    img        = "../b_1.png"
 
     colors = {
         "red":          [255,   0,   0],
